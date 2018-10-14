@@ -58,9 +58,7 @@ void Sudoku::gerar()
 {
   Jogada J;
   int i,k,n;
-
   srand(time(NULL));
-
   do
   {
     // Inicia com o tabuleiro vazio
@@ -295,6 +293,34 @@ int Sudoku::resolver_casas_faceis()
   return num_casas;
 }
 
+void Sudoku::casas_com_menos_possibilidades(int &i, int &j) const
+{
+    unsigned mlc(18);
+    unsigned vl[]= {0,0,0,0,0,0,0,0,0}, vc[]= {0,0,0,0,0,0,0,0,0};
+    i=0;
+    j=0;
+    for(unsigned ii=0; ii<9; ii++)
+    {
+        for(unsigned jj=0; jj<9; jj++)
+        {
+            if(at(ii,jj)==0)
+            {
+                vl[ii]++;
+                vc[jj]++;
+            }
+        }
+        for(unsigned jj=0; jj<9; jj++)
+        {
+            if(((vl[ii]+vc[jj])<mlc) && ((vl[ii]+vc[jj])>0) && (at(ii,jj)==0) )
+            {
+                mlc = (vl[ii]+vc[jj]);
+                i=ii;
+                j=jj;
+            }
+        }
+    }
+}
+
 /// Determina automaticamente a solucao do tabuleiro (preenche as casas vazias)
 /// O parametro com_exibicao controla se o algoritmo deve (true) ou nao (false)
 /// exibir os tabuleiros analisados e o numero de nohs durante o algoritmo
@@ -302,6 +328,7 @@ int Sudoku::resolver_casas_faceis()
 
 bool Sudoku::resolver(bool com_exibicao)
 {
+    if(this->fim_de_jogo()) return true;
     stack<Sudoku> Pilha;
     bool resolvido(false);
     int i,j;
@@ -315,49 +342,52 @@ bool Sudoku::resolver(bool com_exibicao)
     do{
 
         tab = Pilha.top();
+        tab.resolver_casas_faceis();
         Pilha.pop();
 
         if(tab.fim_de_jogo()) {
+            resolvido = true;
             Melhor = tab;
             Melhor.exibir();
-            return true;
         }
         else{
-            i=0;
-            j=0;
-            while (i<9 && tab(i,j) != 0){
-                j++;
-                if (j>=9){
-                    j=0;
-                    i++;
-                }
-            }
-            for(int val=1; val<=9; val++){
-                Jogada J(i,j,val);
-                if(tab.jogada_valida(J)){
+            tab.casas_com_menos_possibilidades(i,j);
+            Jogada J(i,j);
+            for(int val=1; val<=9; val++)
+            {
+                J.setValue(val);
+                if(tab.jogada_valida(J))
+                {
                     Sudoku suc(tab);
                     suc.fazer_jogada(J);
-                    suc.resolver_casas_faceis();
-                    Pilha.push(suc);
-                    num_tab_gerados++;
+                    if(suc.resolver_casas_faceis()<0)
+                    {
+                        if((num_vazias = suc.num_casas_vazias()) < num_vazias_melhor)
+                        {
+                            num_vazias_melhor = num_vazias;
+                            Melhor = suc;
+                        }
+                    }
+                    else
+                    {
+                        Pilha.push(suc);
+                        num_tab_gerados++;
+                    }
                 }
             }
         }
-
         num_tab_testados ++;
-
         if((num_vazias = tab.num_casas_vazias()) < num_vazias_melhor){
             num_vazias_melhor = num_vazias;
             Melhor = tab;
+            Melhor.exibir();
         }
         if(com_exibicao){
             tab.exibir();
-            //tab.exibir_andamento(num_tab_testados, num_tab_gerados, (num_tab_gerados - num_tab_testados));
+            tab.exibir_andamento(num_tab_testados, num_tab_gerados, (num_tab_gerados - num_tab_testados));
         }
     }while((num_tab_gerados - num_tab_testados) && !resolvido);
-    if(!resolvido){
-    }
-    else{
+    if(com_exibicao){
         Melhor.exibir();
     }
     return resolvido;

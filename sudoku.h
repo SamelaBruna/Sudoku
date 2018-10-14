@@ -146,10 +146,12 @@ public:
   /// negativo menor que -81.
   int resolver_casas_faceis();
 
+  void casas_com_menos_possibilidades(int &i, int &j) const;
+
   /// Determina automaticamente a solucao do tabuleiro (preenche as casas vazias).
   /// O parametro com_exibicao controla se o algoritmo deve (true) ou nao (false)
   /// exibir os tabuleiros analisados e o numero de nohs durante o algoritmo.
-  /// Retorna false se nao foi encontrada solucao, true se foi encontrada.
+  // Retorna false se nao foi encontrada solucao, true se foi encontrada.
   bool resolver(bool com_exibicao=true);
 
   /// OS 3 METODOS A SEGUIR ENVOLVEM FORMATACAO.

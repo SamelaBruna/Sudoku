@@ -1,5 +1,6 @@
 #include "sodokun.h"
 #include <QApplication>
+#include "sudoku.h"
 
 sodokun *pt_w;
 
