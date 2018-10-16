@@ -58,9 +58,10 @@ void sodokun::setBackground(int i,int j, QLabel *prov)
     int jj = j/3;
     if((ii == 0 || ii == 2) && (jj==1)) prov->setStyleSheet("background:lightcyan");
     else if(ii==1 && (jj==0 || jj==2)) prov->setStyleSheet("background:lightcyan");
-    else prov->setStyleSheet("background:white");
+    else  prov->setStyleSheet("background:white");
 
  }
+
 
 void sodokun::exibirCelulaAtual(int i, int j, int valor)
 {
@@ -153,7 +154,7 @@ void sodokun::on_ButtonContinuar_clicked()
 void sodokun::on_spinBox_valueChanged(int arg1)
 {
    J.setValue(arg1);
-   if(atual.jogada_valida(J) || atual.apagamento_valido(J,atual)) ui->ButtonJogar->setEnabled(true);
+   if(atual.jogada_valida(J) || atual.apagamento_valido(J,inicial)) ui->ButtonJogar->setEnabled(true);
    else ui->ButtonJogar->setEnabled(false);
 }
 
@@ -168,6 +169,7 @@ void sodokun::on_tableWidget_cellClicked(int row, int column)
         ui->label_18->setText(QString(J.linha()+'A'));
         ui->label_19->setNum(J.coluna()+1);
         sodokun::on_spinBox_valueChanged(J.valor());
+
 
 }
 
